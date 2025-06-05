@@ -4,25 +4,29 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Email Validator Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-  <script src="https://unpkg.com/i18next@21.6.6/dist/umd/i18next.min.js"></script>
 </head>
 <body>
   <header>
-    <img src="logo.png" alt="Logo" class="logo" />
-    <h1>Email Validator Dashboard</h1>
+    <div class="header-content">
+      <img src="logo.png" alt="Logo" />
+      <h1>Email Validator Dashboard</h1>
+    </div>
   </header>
+
   <div class="container">
     <div class="card">
       <h2>🔍 Single Email Validation</h2>
-      <input type="email" id="emailInput" placeholder="Enter email" />
-      <button onclick="validateEmail()">Validate</button>
+      <div class="input-group">
+        <input type="email" id="emailInput" placeholder="Enter email" />
+        <button onclick="validateEmail()">Validate</button>
+      </div>
       <div class="suggestion" id="suggestionBox"></div>
       <div class="result" id="resultBox"></div>
       <button onclick="copyResult()">Copy Result</button>
@@ -34,8 +38,8 @@
       <div id="bulkResult"></div>
     </div>
 
-    <div class="card export-section">
-      <h2>📄 Export Options</h2>
+    <div class="card">
+      <h2>📤 Export Options</h2>
       <button onclick="exportCSV()">Export CSV</button>
       <button onclick="exportPDF()">Export PDF</button>
     </div>

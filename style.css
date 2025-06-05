@@ -1,50 +1,79 @@
 body {
   font-family: 'Segoe UI', sans-serif;
   margin: 0;
-  background: #f9f9f9;
+  background: #f4f6f8;
   color: #333;
 }
 header {
-  background: #4a90e2;
+  background: #3b82f6;
   color: white;
-  padding: 1rem;
-  text-align: center;
+  padding: 1rem 2rem;
 }
-.logo {
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.header-content img {
   height: 40px;
-  vertical-align: middle;
+}
+.header-content h1 {
+  font-size: 1.5rem;
+  margin: 0;
 }
 .container {
   max-width: 1000px;
   margin: 2rem auto;
-  padding: 1rem;
+  padding: 0 1rem;
 }
 .card {
   background: white;
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
   margin-bottom: 2rem;
 }
 .card h2 {
   margin-top: 0;
   font-family: 'DM Serif Display', serif;
 }
-input, button {
-  padding: 0.75rem;
-  font-size: 1rem;
-  margin: 0.5rem 0;
-}
-button {
-  background: #4a90e2;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-.result, .suggestion, .export-section {
+.input-group {
+  display: flex;
+  gap: 10px;
   margin-top: 1rem;
 }
+input[type="email"],
+input[type="file"] {
+  flex: 1;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+button {
+  padding: 0.75rem 1.25rem;
+  background: #3b82f6;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+button:hover {
+  background: #2563eb;
+}
+.result,
+.suggestion {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+.suggestion {
+  color: #d97706;
+}
 canvas {
-  margin-top: 2rem;
+  margin-top: 1rem;
+  background: #f9fafb;
+  padding: 10px;
+  border-radius: 8px;
 }

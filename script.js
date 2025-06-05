@@ -51,19 +51,19 @@ function handleCSV(event) {
   const file = event.target.files[0];
   Papa.parse(file, {
     header: true,
-    complete: function(results) {
-      const emails = results.data.map(row => row.email);
-      emails.forEach(email => {
+    complete: function (results) {
+      const emails = results.data.map((row) => row.email);
+      emails.forEach((email) => {
         if (email) validateEmail(email);
       });
-    }
+    },
   });
 }
 
 function exportCSV() {
   const csv = Papa.unparse(results);
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  saveAs(blob, 'validated_emails.csv');
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  saveAs(blob, "validated_emails.csv");
 }
 
 function exportPDF() {
@@ -78,20 +78,22 @@ function exportPDF() {
 }
 
 function updateChart() {
-  const disposable = results.filter(r => r.is_disposable_email).length;
-  const free = results.filter(r => r.is_free_email).length;
-  const role = results.filter(r => r.is_role_email).length;
+  const disposable = results.filter((r) => r.is_disposable_email).length;
+  const free = results.filter((r) => r.is_free_email).length;
+  const role = results.filter((r) => r.is_role_email).length;
 
-  const ctx = document.getElementById('emailChart').getContext('2d');
+  const ctx = document.getElementById("emailChart").getContext("2d");
   new Chart(ctx, {
-    type: 'bar',
+    type: "bar",
     data: {
-      labels: ['Disposable', 'Free', 'Role-based'],
-      datasets: [{
-        label: 'Email Type Count',
-        data: [disposable, free, role],
-        backgroundColor: ['#f44336', '#4caf50', '#ff9800']
-      }]
-    }
+      labels: ["Disposable", "Free", "Role-based"],
+      datasets: [
+        {
+          label: "Email Type Count",
+          data: [disposable, free, role],
+          backgroundColor: ["#f44336", "#4caf50", "#ff9800"],
+        },
+      ],
+    },
   });
 }

@@ -1,6 +1,6 @@
-self.addEventListener('install', function(e) {
+self.addEventListener('install', function (e) {
   e.waitUntil(
-    caches.open('email-validator').then(function(cache) {
+    caches.open('email-validator').then(function (cache) {
       return cache.addAll([
         '/',
         '/index.html',
@@ -13,9 +13,9 @@ self.addEventListener('install', function(e) {
   );
 });
 
-self.addEventListener('fetch', function(e) {
+self.addEventListener('fetch', function (e) {
   e.respondWith(
-    caches.match(e.request).then(function(response) {
+    caches.match(e.request).then(function (response) {
       return response || fetch(e.request);
     })
   );
