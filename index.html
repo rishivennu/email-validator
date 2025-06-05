@@ -1,19 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Email Validator</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div class="container">
-      <img src="https://abstractapi.com/images/logo.svg" alt="Logo" class="logo"/>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Email Validator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="wrapper">
+    <div class="card">
+      <img src="https://abstractapi.com/images/logo.svg" alt="Logo" class="logo" />
       <h1>Email Validator</h1>
-      <input type="email" id="emailInput" placeholder="Enter email" />
-      <button onclick="validateEmail()">Validate</button>
-      <div id="result" class="result"></div>
+      <p class="subtext">Check email deliverability, safety, and validity with trusted Abstract API.</p>
+      
+      <div class="input-group">
+        <input type="email" id="emailInput" placeholder="Enter your email here" />
+        <button onclick="validateEmail()">Validate</button>
+      </div>
+
+      <div id="result" class="result-box"></div>
+
+      <p class="trust-badge">🔒 Verified by <a href="https://www.abstractapi.com/email-verification-api" target="_blank">Abstract API</a></p>
     </div>
-    <script src="script.js"></script>
-  </body>
+
+    <footer>
+      <p>&copy; 2025 Rishivennu. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
 </html>
