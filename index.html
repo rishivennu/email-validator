@@ -4,15 +4,33 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Email Validator</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg-light: #f0fdf4;
+      --bg-dark: #121212;
+      --card-light: white;
+      --card-dark: #1e1e1e;
+      --text-light: #222;
+      --text-dark: #f9f9f9;
+      --green: #4caf50;
+    }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
+      background: var(--bg-light);
+      color: var(--text-light);
+      transition: background 0.3s, color 0.3s;
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
+    }
+
+    body.dark {
+      background: var(--bg-dark);
+      color: var(--text-dark);
     }
 
     .wrapper {
@@ -24,13 +42,18 @@
     }
 
     .card {
-      background: white;
+      background: var(--card-light);
       padding: 30px;
-      max-width: 450px;
+      max-width: 500px;
       width: 100%;
       border-radius: 20px;
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
       text-align: center;
+      transition: background 0.3s;
+    }
+
+    body.dark .card {
+      background: var(--card-dark);
     }
 
     .logo {
@@ -39,12 +62,13 @@
     }
 
     h1 {
-      font-size: 28px;
+      font-family: 'DM Serif Display', serif;
+      font-size: 32px;
       margin: 10px 0;
     }
 
     .subtext {
-      color: #555;
+      color: inherit;
       font-size: 14px;
       margin-bottom: 20px;
     }
@@ -65,7 +89,7 @@
 
     button {
       padding: 12px 16px;
-      background-color: #4caf50;
+      background-color: var(--green);
       color: white;
       border: none;
       border-radius: 8px;
@@ -73,22 +97,17 @@
       transition: background 0.3s ease;
     }
 
-    button:hover {
-      background-color: #388e3c;
-    }
-
     .result-box {
       text-align: left;
-      background-color: #f9f9f9;
+      background-color: rgba(0, 0, 0, 0.05);
       padding: 15px;
       border-radius: 10px;
       font-size: 15px;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+      margin-top: 20px;
     }
 
     .trust-badge {
       font-size: 13px;
-      color: #666;
       margin-top: 15px;
     }
 
@@ -100,24 +119,48 @@
     footer {
       text-align: center;
       font-size: 13px;
-      color: #777;
       margin-top: 30px;
+      color: inherit;
+    }
+
+    .toggle-btn {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .suggestion {
+      font-size: 13px;
+      color: orange;
+      margin-top: 10px;
+    }
+
+    .copy-btn {
+      margin-top: 10px;
+      background: #555;
     }
   </style>
 </head>
 <body>
+  <button class="toggle-btn" onclick="toggleTheme()">🌙</button>
   <div class="wrapper">
     <div class="card">
       <img src="https://abstractapi.com/images/logo.svg" alt="Logo" class="logo" />
       <h1>Email Validator</h1>
       <p class="subtext">Check email deliverability, safety, and validity with trusted Abstract API.</p>
-      
+
       <div class="input-group">
         <input type="email" id="emailInput" placeholder="Enter your email here" />
         <button onclick="validateEmail()">Validate</button>
       </div>
 
+      <p class="suggestion" id="suggestionBox"></p>
       <div id="result" class="result-box"></div>
+      <button class="copy-btn" onclick="copyResult()">📋 Copy Result</button>
 
       <p class="trust-badge">🔒 Verified by <a href="https://www.abstractapi.com/email-verification-api" target="_blank">Abstract API</a></p>
     </div>
@@ -128,16 +171,45 @@
   </div>
 
   <script>
+    const typoFixes = {
+      "gmial.com": "gmail.com",
+      "gnail.com": "gmail.com",
+      "yaho.com": "yahoo.com",
+      "hotnail.com": "hotmail.com",
+      "outllok.com": "outlook.com"
+    };
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      const btn = document.querySelector('.toggle-btn');
+      btn.textContent = document.body.classList.contains('dark') ? "🌞" : "🌙";
+    }
+
+    function suggestFix(email) {
+      let suggestion = "";
+      const domain = email.split("@")[1];
+      for (let wrong in typoFixes) {
+        if (domain && domain.includes(wrong)) {
+          suggestion = `Did you mean: ${email.replace(wrong, typoFixes[wrong])}?`;
+          break;
+        }
+      }
+      document.getElementById("suggestionBox").textContent = suggestion;
+    }
+
     async function validateEmail() {
-      const email = document.getElementById("emailInput").value;
+      const email = document.getElementById("emailInput").value.trim();
       const resultDiv = document.getElementById("result");
+      const suggestionBox = document.getElementById("suggestionBox");
 
       if (!email) {
         resultDiv.innerHTML = "<p>Please enter an email.</p>";
         return;
       }
 
-      const API_KEY = "1a79d8bd310f46d2af5e272e051c912d"; // 🔑 Replace this with your actual Abstract API key
+      suggestFix(email);
+
+      const API_KEY = "1a79d8bd310f46d2af5e272e051c912d"; // Replace with your real API key
       const url = `https://emailvalidation.abstractapi.com/v1/?api_key=${API_KEY}&email=${encodeURIComponent(email)}`;
 
       resultDiv.innerHTML = "Validating...";
@@ -156,6 +228,14 @@
       } catch (err) {
         resultDiv.innerHTML = "<p>There was an error validating the email.</p>";
         console.error(err);
+      }
+    }
+
+    function copyResult() {
+      const result = document.getElementById("result").innerText;
+      if (result) {
+        navigator.clipboard.writeText(result);
+        alert("Result copied to clipboard!");
       }
     }
   </script>
