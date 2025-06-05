@@ -3,7 +3,9 @@ const typoFixes = {
   "yaho.com": "yahoo.com",
   "outllok.com": "outlook.com"
 };
+
 let results = [];
+let chartInstance = null;
 
 function suggestFix(email) {
   const domain = email.split("@")[1];
@@ -17,17 +19,24 @@ function suggestFix(email) {
   document.getElementById("suggestionBox").innerText = "";
 }
 
-async function validateEmail() {
-  const email = document.getElementById("emailInput").value;
+async function validateEmail(emailFromBulk = null) {
+  const email = emailFromBulk || document.getElementById("emailInput").value;
   suggestFix(email);
-const API_KEY = "1a79d8bd310f46d2af5e272e051c912d"; // 🔑 Replace with your real key
-const url = `https://emailvalidation.abstractapi.com/v1/?api_key=${API_KEY}&email=${encodeURIComponent(email)}`;
+  const API_KEY = "1a79d8bd310f46d2af5e272e051c912d";
+  const url = `https://emailvalidation.abstractapi.com/v1/?api_key=${API_KEY}&email=${encodeURIComponent(email)}`;
 
-  const res = await fetch(url);
-  const data = await res.json();
-  results.push(data);
-  updateResult(data);
-  updateChart();
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    const data = await res.json();
+    console.log("Validation data:", data);
+    results.push(data);
+    updateResult(data);
+    updateChart();
+  } catch (err) {
+    console.error("Validation failed:", err);
+    document.getElementById("resultBox").innerHTML = `<p style="color:red;">Failed to validate <strong>${email}</strong>. Try again later.</p>`;
+  }
 }
 
 function updateResult(data) {
@@ -53,12 +62,12 @@ function handleCSV(event) {
   const file = event.target.files[0];
   Papa.parse(file, {
     header: true,
-    complete: function (results) {
-      const emails = results.data.map((row) => row.email);
-      emails.forEach((email) => {
+    complete: function (parsed) {
+      const emails = parsed.data.map(row => row.email);
+      emails.forEach(email => {
         if (email) validateEmail(email);
       });
-    },
+    }
   });
 }
 
@@ -80,22 +89,25 @@ function exportPDF() {
 }
 
 function updateChart() {
-  const disposable = results.filter((r) => r.is_disposable_email).length;
-  const free = results.filter((r) => r.is_free_email).length;
-  const role = results.filter((r) => r.is_role_email).length;
+  const disposable = results.filter(r => r.is_disposable_email).length;
+  const free = results.filter(r => r.is_free_email).length;
+  const role = results.filter(r => r.is_role_email).length;
 
   const ctx = document.getElementById("emailChart").getContext("2d");
-  new Chart(ctx, {
+
+  if (chartInstance) {
+    chartInstance.destroy(); // Remove old chart before drawing new
+  }
+
+  chartInstance = new Chart(ctx, {
     type: "bar",
     data: {
       labels: ["Disposable", "Free", "Role-based"],
-      datasets: [
-        {
-          label: "Email Type Count",
-          data: [disposable, free, role],
-          backgroundColor: ["#f44336", "#4caf50", "#ff9800"],
-        },
-      ],
-    },
+      datasets: [{
+        label: "Email Type Count",
+        data: [disposable, free, role],
+        backgroundColor: ["#f44336", "#4caf50", "#ff9800"]
+      }]
+    }
   });
 }
