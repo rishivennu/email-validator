@@ -1,30 +1,97 @@
+const typoFixes = {
+  "gmial.com": "gmail.com",
+  "yaho.com": "yahoo.com",
+  "outllok.com": "outlook.com"
+};
+let results = [];
+
+function suggestFix(email) {
+  const domain = email.split("@")[1];
+  for (let typo in typoFixes) {
+    if (domain && domain.includes(typo)) {
+      document.getElementById("suggestionBox").innerText =
+        `Did you mean: ${email.replace(typo, typoFixes[typo])}?`;
+      return;
+    }
+  }
+  document.getElementById("suggestionBox").innerText = "";
+}
+
 async function validateEmail() {
   const email = document.getElementById("emailInput").value;
-  const resultDiv = document.getElementById("result");
+  suggestFix(email);
+  const url = `https://emailvalidation.abstractapi.com/v1/?api_key=YOUR_API_KEY&email=${encodeURIComponent(email)}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  results.push(data);
+  updateResult(data);
+  updateChart();
+}
 
-  if (!email) {
-    resultDiv.innerHTML = "<p>Please enter an email.</p>";
-    return;
-  }
+function updateResult(data) {
+  const resultBox = document.getElementById("resultBox");
+  resultBox.innerHTML = `
+    <p><strong>Email:</strong> ${data.email}</p>
+    <p><strong>Deliverability:</strong> ${data.deliverability}</p>
+    <p><strong>Is Free:</strong> ${data.is_free_email}</p>
+    <p><strong>Disposable:</strong> ${data.is_disposable_email}</p>
+    <p><strong>Role Based:</strong> ${data.is_role_email}</p>
+    <p><strong>Valid Format:</strong> ${data.is_valid_format.value}</p>
+    <p><strong>Suggestion:</strong> ${data.autocorrect || 'None'}</p>
+  `;
+}
 
-  const API_KEY = "1a79d8bd310f46d2af5e272e051c912d"; // 🔑 Replace with your Abstract API key
-  const url = `https://emailvalidation.abstractapi.com/v1/?api_key=${API_KEY}&email=${encodeURIComponent(email)}`;
+function copyResult() {
+  const resultText = document.getElementById("resultBox").innerText;
+  navigator.clipboard.writeText(resultText);
+  alert("Result copied to clipboard!");
+}
 
-  resultDiv.innerHTML = "Validating...";
+function handleCSV(event) {
+  const file = event.target.files[0];
+  Papa.parse(file, {
+    header: true,
+    complete: function(results) {
+      const emails = results.data.map(row => row.email);
+      emails.forEach(email => {
+        if (email) validateEmail(email);
+      });
+    }
+  });
+}
 
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
+function exportCSV() {
+  const csv = Papa.unparse(results);
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  saveAs(blob, 'validated_emails.csv');
+}
 
-    resultDiv.innerHTML = `
-      <p><strong>Deliverability:</strong> ${data.deliverability}</p>
-      <p><strong>Free Email:</strong> ${data.is_free_email ? 'Yes' : 'No'}</p>
-      <p><strong>Disposable:</strong> ${data.is_disposable_email ? 'Yes' : 'No'}</p>
-      <p><strong>Role-based:</strong> ${data.is_role_email ? 'Yes' : 'No'}</p>
-      <p><strong>Valid Format:</strong> ${data.is_valid_format.value ? 'Yes' : 'No'}</p>
-    `;
-  } catch (err) {
-    resultDiv.innerHTML = "<p>There was an error validating the email.</p>";
-    console.error(err);
-  }
+function exportPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  let y = 10;
+  results.forEach((r, i) => {
+    doc.text(`Email ${i + 1}: ${r.email}`, 10, y);
+    y += 10;
+  });
+  doc.save("validated_emails.pdf");
+}
+
+function updateChart() {
+  const disposable = results.filter(r => r.is_disposable_email).length;
+  const free = results.filter(r => r.is_free_email).length;
+  const role = results.filter(r => r.is_role_email).length;
+
+  const ctx = document.getElementById('emailChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Disposable', 'Free', 'Role-based'],
+      datasets: [{
+        label: 'Email Type Count',
+        data: [disposable, free, role],
+        backgroundColor: ['#f44336', '#4caf50', '#ff9800']
+      }]
+    }
+  });
 }
