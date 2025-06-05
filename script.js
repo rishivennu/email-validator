@@ -20,8 +20,9 @@ function suggestFix(email) {
 async function validateEmail() {
   const email = document.getElementById("emailInput").value;
   suggestFix(email);
-const API_KEY = import.meta.env.VITE_ABSTRACT_API_KEY;
+const API_KEY = "1a79d8bd310f46d2af5e272e051c912d"; // 🔑 Replace with your real key
 const url = `https://emailvalidation.abstractapi.com/v1/?api_key=${API_KEY}&email=${encodeURIComponent(email)}`;
+
   const res = await fetch(url);
   const data = await res.json();
   results.push(data);
